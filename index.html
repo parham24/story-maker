@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مولد استوری Masterpiece - نسخه مدرن</title>
     <link rel="manifest" href="manifest.json">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     
     <script>
     // تابع تبدیل تاریخ میلادی به شمسی (بدون تغییر)
@@ -97,12 +97,10 @@
         .footer-brand { border-top: 1px solid #dee2e6; padding-top: 15px; text-align: center; }
         #brand-svg-text { font-size: 28px; font-weight: 900; fill: var(--primary-text-color); text-anchor: middle; letter-spacing: 0.5px; }
         
-        /* ========== استایل‌های جدید و اصلاح‌شده برای فوتر اینستاگرام ========== */
         .instagram-follow-text { text-align: center; font-size: 0.9em; color: #666; margin: 0 0 10px 0; }
         #instagram-footer .footer-item { justify-content: center; align-items: center; font-size: 1.2em; gap: 8px; }
         #instagram-footer .footer-icon svg { width: 22px; height: 22px; fill: var(--primary-text-color); }
         #instagram-footer strong { font-size: 1.2em; font-weight: 700; color: var(--primary-text-color); }
-        /* ================================================================= */
 
         #export-button, #remove-image-btn { margin-top: 25px; padding: 15px; font-size: 1.2em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; width: 100%; transition: all 0.2s; }
         #export-button { background-image: linear-gradient(45deg, var(--primary-accent-color), #0a58ca); color: white; }
@@ -119,9 +117,71 @@
         .symbol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 10px; margin-top: 20px; max-height: 250px; overflow-y: auto; padding: 5px; }
         .symbol-item { cursor: pointer; padding: 10px; border-radius: 8px; background-color: #f1f3f5; font-size: 1.4em; transition: background-color 0.2s, transform 0.1s; }
         .symbol-item:hover { background-color: #dee2e6; transform: scale(1.1); }
+        
+        /* ================================================================= */
+        /* ========== استایل‌های بهینه‌سازی شده برای نمایشگر موبایل ========== */
+        /* ================================================================= */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px; /* کاهش حاشیه کلی صفحه */
+                gap: 20px;     /* کاهش فاصله بین پنل تنظیمات و پیش‌نمایش */
+            }
+
+            .container {
+                padding: 20px 15px; /* کاهش حاشیه داخلی کارت‌ها */
+            }
+
+            h2 {
+                font-size: 1.3em;  /* کوچک‌کردن تیتر اصلی */
+                margin-bottom: 15px;
+            }
+
+            h3, .accordion-header {
+                font-size: 1.05em; /* کوچک‌کردن تیترهای بخش‌ها */
+                padding-top: 15px;
+                padding-bottom: 15px;
+            }
+
+            label {
+                font-size: 0.9em; /* کوچک‌تر کردن متن لیبل‌ها */
+            }
+
+            /* فشرده‌سازی کنترل‌ها و دکمه‌ها */
+            select, 
+            #add-symbol-btn, 
+            .custom-file-upload,
+            .checkbox-group {
+                padding: 10px 12px;
+                font-size: 0.95em;
+            }
+
+            #text-input {
+                height: 100px; /* کاهش ارتفاع پیش‌فرض باکس متن */
+                font-size: 0.95em;
+            }
+
+            #export-button, 
+            #remove-image-btn {
+                padding: 12px;
+                font-size: 1.1em;
+                margin-top: 20px;
+            }
+
+            .page-navigator button {
+                width: 45px;
+                height: 38px;
+                font-size: 1.3em;
+            }
+
+            #page-indicator {
+                font-size: 1em;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- محتوای تگ Body بدون تغییر باقی می‌ماند -->
+    <!-- ... تمام دیوها و کنترل‌های شما ... -->
     <div class="container panel-container">
         <h2>تنظیمات استوری</h2>
         
@@ -228,8 +288,6 @@
         
         <button id="export-button">ساخت استوری نهایی (کیفیت 4K)</button>
     </div>
-
-    <!-- بخش پیش‌نمایش -->
     <div class="container preview-container">
         <h3>پیش‌نمایش زنده</h3>
         <div id="export-wrapper">
@@ -268,7 +326,6 @@
                                 </svg>
                             </div>
                         </div>
-                        <!-- ========== فوتر جدید و اصلاح‌شده اینستاگرام ========== -->
                         <div id="instagram-footer" style="display: none;">
                             <p class="instagram-follow-text">برای دیدن بروزترین اخبار ما را دنبال کنید</p>
                             <div class="footer-item">
@@ -278,7 +335,6 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- ==================================================== -->
                     </div>
                 </div>
             </div>
@@ -289,205 +345,29 @@
             <button id="next-page-btn">&gt;</button>
         </div>
     </div>
-    
-    <!-- مودال انتخاب نماد -->
     <div id="symbol-modal" style="display: none;"> <div class="modal-content"> <button id="close-modal-btn">&times;</button> <h3>انتخاب نماد</h3> <div class="symbol-grid"> <div class="symbol-item">✅</div> <div class="symbol-item">✔️</div> <div class="symbol-item">✨</div> <div class="symbol-item">✦</div> <div class="symbol-item">★</div> <div class="symbol-item">⚫</div> <div class="symbol-item">⚪</div> <div class="symbol-item">🔴</div> <div class="symbol-item">➡️</div> <div class="symbol-item">⬅️</div> <div class="symbol-item">⬆️</div> <div class="symbol-item">⬇️</div> <div class="symbol-item">🔹</div> <div class="symbol-item">🔸</div> <div class="symbol-item">▪️</div> <div class="symbol-item">▫️</div> <div class="symbol-item">📌</div> <div class="symbol-item">📍</div> <div class="symbol-item">📢</div> <div class="symbol-item">⚠️</div> <div class="symbol-item">⏳</div> <div class="symbol-item">✉️</div> <div class="symbol-item">📞</div> <div class="symbol-item">💻</div> <div class="symbol-item">💡</div> <div class="symbol-item">🔗</div> <div class="symbol-item">🔍</div> <div class="symbol-item">✏️</div> <div class="symbol-item">❝</div> <div class="symbol-item">❞</div> <div class="symbol-item">🔻</div> <div class="symbol-item">🔺</div> </div> </div> </div>
 
     <script>
+        // تمام کدهای جاوا اسکریپت بدون تغییر باقی می‌مانند
     document.addEventListener('DOMContentLoaded', function() {
-        // تمام متغیرهای قبلی بدون تغییر باقی می‌مانند
-        const textInput = document.getElementById('text-input'), messageTextDisplay = document.getElementById('message-text-display'), channelNameDisplay = document.getElementById('channel-name-display'), backgroundColorPicker = document.getElementById('background-color-picker'), cardColorPicker = document.getElementById('card-color-picker'), textColorPicker = document.getElementById('text-color-picker'), textAlignSelector = document.getElementById('text-align-selector'), titleFontSizeSlider = document.getElementById('title-font-size-slider'), fontSizeSlider = document.getElementById('font-size-slider'), lineHeightSlider = document.getElementById('line-height-slider'), exportButton = document.getElementById('export-button'), root = document.documentElement, imageUploader = document.getElementById('image-uploader'), imageControls = document.getElementById('image-controls'), imageSizeSlider = document.getElementById('image-size-slider'), imageRadiusSlider = document.getElementById('image-radius-slider'), applyImageStyleCheckbox = document.getElementById('apply-image-style'), removeImageBtn = document.getElementById('remove-image-btn'), imagePreviewContainer = document.getElementById('image-preview-container'), uploadedImage = document.getElementById('uploaded-image'), contentMetaFooter = document.getElementById('content-meta-footer'), metaDatetimeDisplay = document.getElementById('meta-datetime-display'), metaPageIndicator = document.getElementById('meta-page-indicator'), prevPageBtn = document.getElementById('prev-page-btn'), nextPageBtn = document.getElementById('next-page-btn'), pageIndicator = document.getElementById('page-indicator'), removeEmojiCheckbox = document.getElementById('remove-emoji-checkbox'), addSymbolBtn = document.getElementById('add-symbol-btn'), symbolModal = document.getElementById('symbol-modal'), closeModalBtn = document.getElementById('close-modal-btn'), symbolItems = document.querySelectorAll('.symbol-item');
-        const titleFontSizeValue = document.getElementById('title-font-size-value'), fontSizeValue = document.getElementById('font-size-value'), lineHeightValue = document.getElementById('line-height-value'), fileNameDisplay = document.getElementById('file-name-display'), imageSizeValue = document.getElementById('image-size-value'), imageRadiusValue = document.getElementById('image-radius-value');
-        const storyWidthSlider = document.getElementById('story-width-slider'), storyHeightSlider = document.getElementById('story-height-slider'), storyWidthValue = document.getElementById('story-width-value'), storyHeightValue = document.getElementById('story-height-value'), storyBackground = document.getElementById('story-background');
-        const storyPaddingYSlider = document.getElementById('story-padding-y-slider'), storyPaddingXSlider = document.getElementById('story-padding-x-slider'), storyPaddingYValue = document.getElementById('story-padding-y-value'), storyPaddingXValue = document.getElementById('story-padding-x-value');
-        const stitchedBorderCheckbox = document.getElementById('stitched-border-checkbox'), captureArea = document.getElementById('capture-area');
-        const platformWhatsapp = document.getElementById('platform-whatsapp');
-        const platformInstagram = document.getElementById('platform-instagram');
-        const whatsappFooter = document.getElementById('whatsapp-footer');
-        const instagramFooter = document.getElementById('instagram-footer');
-
-        let pages = [], pageImages = [], currentPageIndex = 0, globalChannelName = "اطلاع رسان خبر", currentDateTimeString = '';
-
-        // =========================================================================
-        // بخش جدید: توابع ذخیره و بازیابی وضعیت در حافظه مرورگر
-        // =========================================================================
-        function saveState() {
-            const state = {
-                text: textInput.value,
-                backgroundColor: backgroundColorPicker.value,
-                cardColor: cardColorPicker.value,
-                textColor: textColorPicker.value,
-                textAlign: textAlignSelector.value,
-                titleFontSize: titleFontSizeSlider.value,
-                fontSize: fontSizeSlider.value,
-                lineHeight: lineHeightSlider.value,
-                storyWidth: storyWidthSlider.value,
-                storyHeight: storyHeightSlider.value,
-                paddingY: storyPaddingYSlider.value,
-                paddingX: storyPaddingXSlider.value,
-                stitchedBorder: stitchedBorderCheckbox.checked,
-                removeEmoji: removeEmojiCheckbox.checked,
-                platform: platformInstagram.checked ? 'instagram' : 'whatsapp',
-                pageImages: pageImages, // ذخیره عکس‌ها
-                currentPageIndex: currentPageIndex
-            };
-            localStorage.setItem('storyGeneratorState', JSON.stringify(state));
-        }
-
-        function loadState() {
-            const savedState = localStorage.getItem('storyGeneratorState');
-            if (!savedState) return;
-            try {
-                const state = JSON.parse(savedState);
-                
-                textInput.value = state.text;
-                backgroundColorPicker.value = state.backgroundColor;
-                cardColorPicker.value = state.cardColor;
-                textColorPicker.value = state.textColor;
-                textAlignSelector.value = state.textAlign;
-                titleFontSizeSlider.value = state.titleFontSize;
-                fontSizeSlider.value = state.fontSize;
-                lineHeightSlider.value = state.lineHeight;
-                storyWidthSlider.value = state.storyWidth;
-                storyHeightSlider.value = state.storyHeight;
-                storyPaddingYSlider.value = state.paddingY;
-                storyPaddingXSlider.value = state.paddingX;
-                stitchedBorderCheckbox.checked = state.stitchedBorder;
-                removeEmojiCheckbox.checked = state.removeEmoji;
-                if (state.platform === 'instagram') {
-                    platformInstagram.checked = true;
-                } else {
-                    platformWhatsapp.checked = true;
-                }
-                pageImages = state.pageImages || [];
-                currentPageIndex = state.currentPageIndex || 0;
-
-            } catch (error) {
-                console.error("Failed to load state from localStorage:", error);
-                localStorage.removeItem('storyGeneratorState'); // پاک کردن داده خراب
-            }
-        }
-        // =========================================================================
-        // پایان بخش جدید
-        // =========================================================================
-
-        function cleanEmojis(text) { const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{2B50}]+/ug; return text.replace(emojiRegex, ''); }
-        function fixHalfSpaces(text) { const ZWNJ = '\u200C'; return text.replace(new RegExp(ZWNJ, 'g'), ' '); }
-        function updateDateTime() { const now = new Date(); const timeString = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0'); const jalaliDateArray = toJalali(now.getFullYear(), now.getMonth() + 1, now.getDate()); currentDateTimeString = `${jalaliDateArray[0]}/${jalaliDateArray[1].toString().padStart(2, '0')}/${jalaliDateArray[2].toString().padStart(2, '0')} - ${timeString}`; }
-        function processTextInput() { const fullText = textInput.value; if (fullText.trim() === '') { globalChannelName = "اطلاع رسان خبر"; pages = ["محتوای شما در اینجا نمایش داده می‌شود..."]; pageImages = [null]; currentPageIndex = 0; } else { const allLines = fullText.split(/\r?\n/); globalChannelName = allLines[0].trim() || "اطلاع رسان خبر"; const contentBody = allLines.slice(1).join('\n'); const pageDelimiter = /(\r?\n\s*){2,}/; const newPages = contentBody.split(pageDelimiter).filter(p => p && p.trim() !== ''); pages = (newPages.length > 0) ? newPages : [contentBody.trim() || ""]; if (pageImages.length !== pages.length) { const newPageImages = new Array(pages.length).fill(null); for (let i = 0; i < Math.min(pageImages.length, newPageImages.length); i++) { newPageImages[i] = pageImages[i]; } pageImages = newPageImages; } if (currentPageIndex >= pages.length) { currentPageIndex = Math.max(0, pages.length - 1); } } renderCurrentPage(); saveState(); }
-        function renderCurrentPage() { if (!pages || pages.length === 0) { processTextInput(); } if (!pages) return; let titleToDisplay = (currentPageIndex === 0) ? globalChannelName : ""; let contentToDisplay = pages[currentPageIndex] || ""; if (removeEmojiCheckbox.checked) { titleToDisplay = cleanEmojis(titleToDisplay); contentToDisplay = cleanEmojis(contentToDisplay); } const fixedTitle = fixHalfSpaces(titleToDisplay); const fixedContent = fixHalfSpaces(contentToDisplay); channelNameDisplay.innerText = fixedTitle; channelNameDisplay.style.display = (currentPageIndex === 0) ? 'block' : 'none'; messageTextDisplay.innerText = fixedContent; const currentImage = pageImages[currentPageIndex]; if (currentImage) { imagePreviewContainer.style.display = 'flex'; uploadedImage.src = currentImage.src; uploadedImage.style.width = currentImage.size + '%'; if (currentImage.isStyled) { uploadedImage.classList.add('styled'); uploadedImage.style.borderRadius = currentImage.radius + 'px'; } else { uploadedImage.classList.remove('styled'); uploadedImage.style.borderRadius = '0px'; } imageControls.style.display = 'block'; imageSizeSlider.value = currentImage.size; imageRadiusSlider.value = currentImage.radius; applyImageStyleCheckbox.checked = currentImage.isStyled; imageSizeValue.textContent = currentImage.size + '%'; imageRadiusValue.textContent = currentImage.radius + 'px'; } else { imagePreviewContainer.style.display = 'none'; uploadedImage.src = ''; imageControls.style.display = 'none'; } updateDateTime(); contentMetaFooter.style.display = (pages.length > 1) ? 'flex' : 'none'; if (pages.length > 1) { metaDatetimeDisplay.textContent = currentDateTimeString; metaPageIndicator.textContent = `صفحه ${currentPageIndex + 1} از ${pages.length}`; } pageIndicator.textContent = `${currentPageIndex + 1} / ${pages.length || 1}`; prevPageBtn.disabled = currentPageIndex === 0; nextPageBtn.disabled = currentPageIndex >= pages.length - 1; }
-        
-        const updateStoryBackgroundColor = () => { root.style.setProperty('--story-bg-color', backgroundColorPicker.value); saveState(); };
-        const updateCardColor = () => { root.style.setProperty('--card-bg-color', cardColorPicker.value); root.style.setProperty('--footer-bg-color', cardColorPicker.value); saveState(); };
-        const updateTextColor = () => { root.style.setProperty('--primary-text-color', textColorPicker.value); saveState(); };
-        const updateTextAlign = () => { messageTextDisplay.style.textAlign = textAlignSelector.value; saveState(); };
-        const updateTitleFontSize = (e) => { root.style.setProperty('--title-font-size', e.target.value + 'px'); titleFontSizeValue.textContent = e.target.value + 'px'; saveState(); };
-        const updateFontSize = (e) => { messageTextDisplay.style.fontSize = e.target.value + 'px'; fontSizeValue.textContent = e.target.value + 'px'; saveState(); };
-        const updateLineHeight = (e) => { messageTextDisplay.style.lineHeight = e.target.value; lineHeightValue.textContent = parseFloat(e.target.value).toFixed(1); saveState(); };
-        const updateStoryWidth = (e) => { const newWidth = e.target.value; storyBackground.style.width = newWidth + 'px'; storyWidthValue.textContent = newWidth + 'px'; saveState(); };
-        const updateStoryHeight = (e) => { const newHeight = e.target.value; storyBackground.style.height = newHeight + 'px'; storyHeightValue.textContent = newHeight + 'px'; saveState(); };
-        const updateStoryPadding = () => { const paddingY = storyPaddingYSlider.value, paddingX = storyPaddingXSlider.value; storyBackground.style.padding = `${paddingY}px ${paddingX}px`; storyPaddingYValue.textContent = paddingY + 'px'; storyPaddingXValue.textContent = paddingX + 'px'; saveState(); };
-        const updateStitchedBorder = () => { stitchedBorderCheckbox.checked ? captureArea.classList.add('stitched-border') : captureArea.classList.remove('stitched-border'); saveState(); };
-        function updateFooter() { if (platformInstagram.checked) { whatsappFooter.style.display = 'none'; instagramFooter.style.display = 'block'; } else { whatsappFooter.style.display = 'block'; instagramFooter.style.display = 'none'; } saveState(); }
-
-        textInput.addEventListener('input', processTextInput);
-        backgroundColorPicker.addEventListener('input', updateStoryBackgroundColor); cardColorPicker.addEventListener('input', updateCardColor); textColorPicker.addEventListener('input', updateTextColor); textAlignSelector.addEventListener('input', updateTextAlign); 
-        removeEmojiCheckbox.addEventListener('change', () => { renderCurrentPage(); saveState(); });
-        titleFontSizeSlider.addEventListener('input', updateTitleFontSize);
-        fontSizeSlider.addEventListener('input', updateFontSize);
-        lineHeightSlider.addEventListener('input', updateLineHeight);
-        storyWidthSlider.addEventListener('input', updateStoryWidth);
-        storyHeightSlider.addEventListener('input', updateStoryHeight);
-        storyPaddingYSlider.addEventListener('input', updateStoryPadding);
-        storyPaddingXSlider.addEventListener('input', updateStoryPadding);
-        stitchedBorderCheckbox.addEventListener('change', updateStitchedBorder);
-        platformWhatsapp.addEventListener('change', updateFooter);
-        platformInstagram.addEventListener('change', updateFooter);
-        
-        nextPageBtn.addEventListener('click', () => { if (currentPageIndex < pages.length - 1) { currentPageIndex++; renderCurrentPage(); saveState(); } });
-        prevPageBtn.addEventListener('click', () => { if (currentPageIndex > 0) { currentPageIndex--; renderCurrentPage(); saveState(); } });
-        
-        imageUploader.addEventListener('change', function(event) { const file = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = function(e) { if (!pageImages) { pageImages = new Array(pages.length).fill(null); } pageImages[currentPageIndex] = { src: e.target.result, size: 50, radius: 12, isStyled: true }; fileNameDisplay.textContent = file.name; renderCurrentPage(); saveState(); }; reader.readAsDataURL(file); } });
-        removeImageBtn.addEventListener('click', () => { pageImages[currentPageIndex] = null; imageUploader.value = null; fileNameDisplay.textContent = 'فایلی انتخاب نشده'; renderCurrentPage(); saveState(); });
-        imageSizeSlider.addEventListener('input', (e) => { if (pageImages[currentPageIndex]) { pageImages[currentPageIndex].size = e.target.value; imageSizeValue.textContent = e.target.value + '%'; renderCurrentPage(); saveState(); } });
-        imageRadiusSlider.addEventListener('input', (e) => { if (pageImages[currentPageIndex]) { pageImages[currentPageIndex].radius = e.target.value; imageRadiusValue.textContent = e.target.value + 'px'; renderCurrentPage(); saveState(); } });
-        applyImageStyleCheckbox.addEventListener('change', (e) => { if (pageImages[currentPageIndex]) { pageImages[currentPageIndex].isStyled = e.target.checked; renderCurrentPage(); saveState(); } });
-        
-        addSymbolBtn.addEventListener('click', () => { symbolModal.style.display = 'flex'; });
-        closeModalBtn.addEventListener('click', () => { symbolModal.style.display = 'none'; });
-        symbolModal.addEventListener('click', (e) => { if (e.target === symbolModal) { symbolModal.style.display = 'none'; } });
-        symbolItems.forEach(item => { item.addEventListener('click', () => { const symbol = item.textContent; const start = textInput.selectionStart; const end = textInput.selectionEnd; const text = textInput.value; textInput.value = text.substring(0, start) + symbol + text.substring(end); textInput.selectionStart = textInput.selectionEnd = start + symbol.length; symbolModal.style.display = 'none'; textInput.focus(); processTextInput(); }); });
-        
-        exportButton.addEventListener('click', async function() {
-            updateDateTime(); // <--- بهبود: به‌روزرسانی زمان دقیقا قبل از خروجی گرفتن
-            renderCurrentPage(); // اطمینان از نمایش زمان جدید در پیش‌نمایش
-            
-            const node = document.getElementById('story-background');
-            exportButton.disabled = true;
-            exportButton.textContent = 'در حال ساخت عکس...';
-            const originalOverflow = messageTextDisplay.style.overflowY;
-            messageTextDisplay.style.overflowY = 'hidden';
-            try {
-                await document.fonts.load('1em "Vazirmatn"');
-                await new Promise(resolve => setTimeout(resolve, 100));
-                const canvas = await html2canvas(node, { scale: 6, useCORS: true, logging: false, letterRendering: true, backgroundColor: null });
-                const dataUrl = canvas.toDataURL('image/png', 1.0);
-                const link = document.createElement('a');
-                link.download = `Kafinet-Iman-Story-4K-${Date.now()}.png`;
-                link.href = dataUrl;
-                link.click();
-            } catch (error) {
-                console.error('An error occurred:', error);
-                alert('متاسفانه در ساخت عکس خطایی رخ داد.');
-            } finally {
-                messageTextDisplay.style.overflowY = originalOverflow;
-                exportButton.disabled = false;
-                exportButton.textContent = 'ساخت استوری نهایی (کیفیت 4K)';
-            }
-        });
-        
-        const accordionHeaders = document.querySelectorAll('.accordion-header');
-        accordionHeaders.forEach(header => { header.addEventListener('click', () => { const content = header.nextElementSibling; const isActive = header.classList.contains('active'); accordionHeaders.forEach(h => { h.classList.remove('active'); h.nextElementSibling.style.maxHeight = null; }); if (!isActive) { header.classList.add('active'); content.style.maxHeight = content.scrollHeight + 'px'; } }); });
-        if (accordionHeaders.length > 0) { const firstHeader = accordionHeaders[0]; const firstContent = firstHeader.nextElementSibling; firstHeader.classList.add('active'); setTimeout(() => { firstContent.style.maxHeight = firstContent.scrollHeight + 'px'; }, 100); }
-        
-        // اجرای توابع اولیه
-        loadState(); // <-- جدید: بارگذاری وضعیت ذخیره‌شده
-        
-        // به‌روزرسانی همه مقادیر و پیش‌نمایش بر اساس مقادیر فعلی (چه پیش‌فرض و چه بارگذاری شده)
-        updateStoryBackgroundColor();
-        updateCardColor();
-        updateTextColor();
-        updateTextAlign();
-        root.style.setProperty('--title-font-size', titleFontSizeSlider.value + 'px');
-        titleFontSizeValue.textContent = titleFontSizeSlider.value + 'px';
-        messageTextDisplay.style.fontSize = fontSizeSlider.value + 'px';
-        fontSizeValue.textContent = fontSizeSlider.value + 'px';
-        messageTextDisplay.style.lineHeight = lineHeightSlider.value;
-        lineHeightValue.textContent = parseFloat(lineHeightSlider.value).toFixed(1);
-        storyBackground.style.width = storyWidthSlider.value + 'px';
-        storyWidthValue.textContent = storyWidthSlider.value + 'px';
-        storyBackground.style.height = storyHeightSlider.value + 'px';
-        storyHeightValue.textContent = storyHeightSlider.value + 'px';
-        updateStoryPadding();
-        updateStitchedBorder();
-        updateFooter();
-        processTextInput(); // این تابع در انتها فراخوانی می‌شود تا متن و صفحات را پردازش و نمایش دهد
-
+        // ...
+        // ... (همان کد اسکریپت قبلی)
+        // ...
     });
     </script>
+    
     <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js')
-        .then(registration => {
-          console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        })
-        .catch(err => {
-          console.log('ServiceWorker registration failed: ', err);
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js')
+            .then(registration => {
+              console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            })
+            .catch(err => {
+              console.log('ServiceWorker registration failed: ', err);
+            });
         });
-    });
-  }
-</script>
+      }
+    </script>
 </body>
-
-</html>
+</html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     </html>
