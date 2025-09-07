@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مولد استوری Masterpiece - نسخه مدرن</title>
+    <link rel="manifest" href="manifest.json">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <script>
+    // تابع تبدیل تاریخ میلادی به شمسی (بدون تغییر)
+    function toJalali(gy, gm, gd) {
+        var g_d_m = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+        var jy = (gy <= 1600) ? 0 : 979; gy -= (gy <= 1600) ? 621 : 1600; var gy2 = (gm > 2) ? (gy + 1) : gy;
+        var days = 365 * gy + parseInt((gy2 + 3) / 4) - parseInt((gy2 + 99) / 100) + parseInt((gy2 + 399) / 400) - 80 + gd + g_d_m[gm - 1];
+        jy += 33 * parseInt(days / 12053); days %= 12053; jy += 4 * parseInt(days / 1461); days %= 1461;
+        jy += parseInt((days - 1) / 365); if (days > 365) days = (days - 1) % 365;
+        var jm = (days < 186) ? 1 + parseInt(days / 31) : 7 + parseInt((days - 186) / 30);
+        var jd = 1 + ((days < 186) ? (days % 31) : ((days - 186) % 30)); return [jy, jm, jd];
+    }
+    </script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --card-bg-color: #ffffff; --story-bg-color: #ffde59; --primary-text-color: #212529;
+            --footer-bg-color: #f8f9fa; --primary-accent-color: #0d6efd; --meta-text-color: #888;
+            --title-font-size: 1.2em; --border-color: #dee2e6;
+        }
+        body {
+            font-family: 'Vazirmatn', sans-serif; background-color: #f0f2f5;
+            display: grid; grid-template-columns: 480px 420px;
+            justify-content: center; align-items: flex-start; gap: 30px; padding: 30px;
+        }
+        @media (max-width: 980px) {
+            body { grid-template-columns: 1fr; max-width: 500px; margin: auto; }
+        }
+        .container {
+            background-color: #fff; padding: 25px 30px; border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box;
+        }
+        h2 { color: #333; padding-bottom: 15px; margin: 0 0 25px 0; font-size: 1.5em; text-align: center; }
+        h3 { color: #333; border-bottom: 2px solid var(--primary-accent-color); padding-bottom: 10px; margin-top: 0; }
+        .control-panel { display: flex; flex-direction: column; gap: 0; }
+        .settings-group { border-top: 1px solid var(--border-color); }
+        .settings-group:first-child { border-top: none; }
+        .grid-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 10px; }
+        label { font-weight: bold; color: #555; font-size: 0.95em; display: flex; justify-content: space-between; align-items: center; }
+        .slider-value { font-weight: normal; font-size: 0.9em; background-color: #e9ecef; color: #495057; padding: 3px 8px; border-radius: 7px; }
+        select, #add-symbol-btn { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); font-family: inherit; background-color: #f8f9fa; transition: border-color 0.2s; }
+        select:hover, #add-symbol-btn:hover { border-color: #aaa; }
+        #add-symbol-btn { cursor: pointer; text-align: center; margin-top: -10px; margin-bottom: 15px; font-weight: bold; color: #333; }
+        input[type="range"] { width: 100%; height: 8px; background: #e9ecef; border-radius: 5px; outline: none; -webkit-appearance: none; appearance: none; margin-top: 5px; }
+        input[type="range"]::-webkit-slider-thumb { width: 20px; height: 20px; background: var(--primary-accent-color); border-radius: 50%; cursor: pointer; -webkit-appearance: none; appearance: none; transition: transform 0.2s; }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+        .color-picker-wrapper { display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); }
+        input[type="color"] { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; padding: 0; border: none; border-radius: 50%; cursor: pointer; background-color: transparent; }
+        input[type="color"]::-webkit-color-swatch { border-radius: 50%; border: 2px solid #e0e0e0; }
+        #text-input { width: 100%; height: 120px; padding: 10px; font-size: 1em; border-radius: 8px; resize: vertical; border: 1px solid var(--border-color); box-sizing: border-box; margin-bottom: 15px; }
+        .checkbox-group { display: flex; flex-direction: row; align-items: center; gap: 10px; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 10px; }
+        .checkbox-group:last-child { margin-bottom: 0; }
+        .checkbox-group label { margin-bottom: 0; font-weight: normal; cursor: pointer; width: 100%; }
+        
+        .accordion-header { cursor: pointer; position: relative; margin-bottom: 0; padding: 20px 0; border-bottom: none; color: #333; font-size: 1.1em; transition: color 0.2s; }
+        .accordion-header:hover { color: var(--primary-accent-color); }
+        .accordion-header::before { content: '+'; position: absolute; left: 0; top: 50%; transform: translateY(-50%); font-size: 1.6em; font-weight: bold; color: var(--primary-accent-color); transition: transform 0.3s ease-out; }
+        .accordion-header.active::before { content: '−'; transform: translateY(-50%) rotate(180deg); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; padding: 0; }
+        .accordion-header.active + .accordion-content { padding-bottom: 25px; }
+
+        input[type="file"] { display: none; }
+        .custom-file-upload { border: 1px dashed #aaa; border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; }
+        .custom-file-upload:hover { background-color: #f8f9fa; border-color: var(--primary-accent-color); }
+        #file-name-display { font-size: 0.9em; color: #6c757d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+        
+        #export-wrapper { display: inline-block; }
+        #story-background { border-radius: 25px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; background-color: var(--story-bg-color); transition: width 0.1s, height 0.1s; }
+        #capture-area { width: 100%; height: 100%; background-color: var(--card-bg-color); border-radius: 20px; box-shadow: 0 15px 45px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; }
+        #capture-area.stitched-border { border: 2px dashed rgba(0, 0, 0, 0.2); }
+        .post-container { flex-grow: 1; display: flex; flex-direction: column; padding: 30px 25px 0; direction: rtl; overflow: hidden; }
+        #image-preview-container { display: flex; justify-content: center; margin-bottom: 20px; flex-shrink: 0; }
+        #uploaded-image { max-width: 100%; height: auto; object-fit: contain; transition: all 0.2s; }
+        #uploaded-image.styled { border-radius: 12px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .channel-name, .message-text { text-rendering: optimizeLegibility; }
+        .channel-name { font-weight: bold; color: var(--primary-text-color); margin-bottom: 15px; font-size: var(--title-font-size); flex-shrink: 0; }
+        .message-text { font-size: 17px; line-height: 2; color: var(--primary-text-color); white-space: pre-wrap; word-wrap: break-word; text-align: justify; overflow-y: auto; flex-grow: 1; padding-bottom: 15px; }
+        .content-meta-footer, .ad-footer, .page-navigator { flex-shrink: 0; }
+        .content-meta-footer { display: none; position: relative; align-items: center; padding: 10px 25px; border-top: 1px dashed #ccc; color: var(--meta-text-color); font-size: 0.8em; }
+        #meta-datetime-display { direction: ltr; }
+        #meta-page-indicator { position: absolute; left: 50%; transform: translateX(-50%); font-weight: bold; }
+        .ad-footer { background-color: var(--footer-bg-color); color: #444; padding: 15px 25px; border-top: 1px solid #e9ecef; direction: rtl; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+        .footer-info { margin-bottom: 15px; } .footer-item { display: flex; align-items: center; gap: 12px; font-size: 0.9em; } .footer-item:first-child { margin-bottom: 10px; } .footer-icon svg { width: 18px; height: 18px; fill: #555; }
+        .footer-brand { border-top: 1px solid #dee2e6; padding-top: 15px; text-align: center; }
+        #brand-svg-text { font-size: 28px; font-weight: 900; fill: var(--primary-text-color); text-anchor: middle; letter-spacing: 0.5px; }
+        
+        /* ========== استایل‌های جدید و اصلاح‌شده برای فوتر اینستاگرام ========== */
+        .instagram-follow-text { text-align: center; font-size: 0.9em; color: #666; margin: 0 0 10px 0; }
+        #instagram-footer .footer-item { justify-content: center; align-items: center; font-size: 1.2em; gap: 8px; }
+        #instagram-footer .footer-icon svg { width: 22px; height: 22px; fill: var(--primary-text-color); }
+        #instagram-footer strong { font-size: 1.2em; font-weight: 700; color: var(--primary-text-color); }
+        /* ================================================================= */
+
+        #export-button, #remove-image-btn { margin-top: 25px; padding: 15px; font-size: 1.2em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; width: 100%; transition: all 0.2s; }
+        #export-button { background-image: linear-gradient(45deg, var(--primary-accent-color), #0a58ca); color: white; }
+        #export-button:disabled { background-image: none; background-color: #6c757d; cursor: wait;}
+        #remove-image-btn { background-image: linear-gradient(45deg, #dc3545, #b02a37); color: white; margin-top: 10px; }
+        .page-navigator { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 15px; }
+        .page-navigator button { background-color: #e9ecef; color: #333; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1.5em; font-weight: bold; cursor: pointer; width: 50px; height: 40px; transition: all 0.2s; }
+        .page-navigator button:hover:not(:disabled) { background-color: var(--primary-accent-color); color: white; border-color: var(--primary-accent-color); }
+        .page-navigator button:disabled { background-color: #f8f9fa; color: #ced4da; cursor: not-allowed; }
+        #page-indicator { font-size: 1.1em; font-weight: bold; color: #555; }
+        #symbol-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background-color: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); width: 90%; max-width: 400px; text-align: center; position: relative; }
+        #close-modal-btn { position: absolute; top: 10px; left: 15px; font-size: 28px; font-weight: bold; color: #888; cursor: pointer; border: none; background: none; }
+        .symbol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 10px; margin-top: 20px; max-height: 250px; overflow-y: auto; padding: 5px; }
+        .symbol-item { cursor: pointer; padding: 10px; border-radius: 8px; background-color: #f1f3f5; font-size: 1.4em; transition: background-color 0.2s, transform 0.1s; }
+        .symbol-item:hover { background-color: #dee2e6; transform: scale(1.1); }
+    </style>
+</head>
+<body>
+    <div class="container panel-container">
+        <h2>تنظیمات استوری</h2>
+        
+        <div class="settings-group">
+            <h3 class="accordion-header">محتوای اصلی و متن</h3>
+            <div class="accordion-content">
+                <textarea id="text-input" placeholder="خط اول: عنوان (فقط در صفحه اول).&#10;ادامه متن: محتوای شما.&#10;برای صفحه جدید، دو بار اینتر بزنید."></textarea>
+                <button id="add-symbol-btn">افزودن نماد ✦</button>
+                <div class="checkbox-group">
+                     <input type="checkbox" id="remove-emoji-checkbox" checked>
+                     <label for="remove-emoji-checkbox">حذف خودکار ایموجی‌ها از متن</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h3 class="accordion-header">رنگ و چیدمان</h3>
+            <div class="accordion-content">
+                <div class="grid-controls">
+                     <div class="control-group"> <div class="color-picker-wrapper"><label>پس زمینه</label><input type="color" id="background-color-picker" value="#ffde59"></div> </div>
+                     <div class="control-group"> <div class="color-picker-wrapper"><label>کارت</label><input type="color" id="card-color-picker" value="#ffffff"></div> </div>
+                     <div class="control-group"> <div class="color-picker-wrapper"><label>متن</label><input type="color" id="text-color-picker" value="#212529"></div> </div>
+                     <div class="control-group"> <select id="text-align-selector"> <option value="justify" selected>دو طرفه</option> <option value="right">راست‌چین</option> <option value="center">وسط‌چین</option> </select></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-group">
+            <h3 class="accordion-header">فونت و فاصله خطوط</h3>
+            <div class="accordion-content">
+                <div class="control-group"> <label for="title-font-size-slider">اندازه فونت تیتر <span id="title-font-size-value" class="slider-value">19px</span></label> <input type="range" id="title-font-size-slider" min="14" max="32" value="19" step="1"> </div>
+                <div class="control-group"> <label for="font-size-slider">اندازه فونت متن <span id="font-size-value" class="slider-value">17px</span></label> <input type="range" id="font-size-slider" min="12" max="26" value="17" step="1"> </div>
+                <div class="control-group"> <label for="line-height-slider">فاصله بین خطوط <span id="line-height-value" class="slider-value">2.0</span></label> <input type="range" id="line-height-slider" min="1.4" max="2.8" value="2" step="0.1"> </div>
+            </div>
+        </div>
+        
+        <div class="settings-group">
+            <h3 class="accordion-header">ابعاد و حاشیه</h3>
+            <div class="accordion-content">
+                <div class="control-group">
+                    <label for="story-width-slider">عرض کل تصویر <span id="story-width-value" class="slider-value">360px</span></label>
+                    <input type="range" id="story-width-slider" min="300" max="600" value="360" step="1">
+                </div>
+                <div class="control-group">
+                    <label for="story-height-slider">ارتفاع کل تصویر <span id="story-height-value" class="slider-value">640px</span></label>
+                    <input type="range" id="story-height-slider" min="500" max="900" value="640" step="1">
+                </div>
+                <div class="control-group">
+                    <label for="story-padding-y-slider">حاشیه عمودی (بالا/پایین) <span id="story-padding-y-value" class="slider-value">20px</span></label>
+                    <input type="range" id="story-padding-y-slider" min="0" max="150" value="20" step="1">
+                </div>
+                <div class="control-group">
+                    <label for="story-padding-x-slider">حاشیه افقی (چپ/راست) <span id="story-padding-x-value" class="slider-value">20px</span></label>
+                    <input type="range" id="story-padding-x-slider" min="0" max="100" value="20" step="1">
+                </div>
+            </div>
+        </div>
+
+        <div class="settings-group">
+            <h3 class="accordion-header">ظاهر کارت و پلتفرم</h3>
+             <div class="accordion-content">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="stitched-border-checkbox">
+                    <label for="stitched-border-checkbox">افزودن حاشیه دوخت‌مانند</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="radio" id="platform-whatsapp" name="platform" value="whatsapp" checked>
+                    <label for="platform-whatsapp">واتساپ (خدمات کامپیوتری)</label>
+                </div>
+                <div class="checkbox-group">
+                    <input type="radio" id="platform-instagram" name="platform" value="instagram">
+                    <label for="platform-instagram">اینستاگرام (CPNewsWorld)</label>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-group">
+            <h3 class="accordion-header">تصویر</h3>
+            <div class="accordion-content">
+                 <div class="control-group">
+                     <input type="file" id="image-uploader" accept="image/png, image/jpeg">
+                     <label for="image-uploader" class="custom-file-upload">
+                        <span>آپلود تصویر برای صفحه فعلی</span>
+                        <span id="file-name-display">فایلی انتخاب نشده</span>
+                     </label>
+                 </div>
+                 <div id="image-controls" style="display: none;">
+                     <div class="control-group">
+                         <label for="image-size-slider">اندازه تصویر <span id="image-size-value" class="slider-value">50%</span></label>
+                         <input type="range" id="image-size-slider" min="20" max="90" value="50">
+                     </div>
+                     <div class="control-group">
+                         <label for="image-radius-slider">انحنای گوشه <span id="image-radius-value" class="slider-value">12px</span></label> 
+                         <input type="range" id="image-radius-slider" min="0" max="50" value="12">
+                     </div>
+                     <div class="checkbox-group">
+                        <input type="checkbox" id="apply-image-style" checked>
+                        <label for="apply-image-style">اعمال استایل (سایه و گوشه گرد)</label>
+                     </div>
+                     <button id="remove-image-btn">حذف تصویر این صفحه</button>
+                 </div>
+            </div>
+        </div>
+        
+        <button id="export-button">ساخت استوری نهایی (کیفیت 4K)</button>
+    </div>
+
+    <!-- بخش پیش‌نمایش -->
+    <div class="container preview-container">
+        <h3>پیش‌نمایش زنده</h3>
+        <div id="export-wrapper">
+            <div id="story-background">
+                <div id="capture-area">
+                    <div class="post-container">
+                        <div id="image-preview-container" style="display: none;">
+                            <img id="uploaded-image" src="" alt="Uploaded Image">
+                        </div>
+                        <div id="channel-name-display" class="channel-name"></div>
+                        <div id="message-text-display" class="message-text"></div>
+                    </div>
+                    <div class="content-meta-footer" id="content-meta-footer">
+                        <span id="meta-datetime-display"></span>
+                        <span id="meta-page-indicator"></span>
+                    </div>
+                    <div class="ad-footer">
+                        <div id="whatsapp-footer">
+                            <div class="footer-info">
+                                <div class="footer-item">
+                                    <div class="footer-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M215.7 499.2C267 435 384 279.4 384 192C384 86 298 0 192 0S0 86 0 192c0 87.4 117 243 168.3 307.2c12.3 15.3 35.1 15.3 47.4 0zM192 128a64 64 0 1 1 0 128 64 64 0 1 1 0-128z"/></svg>
+                                    </div>
+                                    <span>خوزستان، اندیمشک، شهرآزادی، بوستان ۲</span>
+                                </div>
+                                <div class="footer-item">
+                                    <div class="footer-icon">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M164.9 24.6c-7.7-18.6-28-28.5-47.4-23.2l-88 24C12.1 30.2 0 46 0 64C0 311.4 200.6 512 448 512c18 0 33.8-12.1 38.6-29.5l24-88c5.3-19.4-4.6-39.7-23.2-47.4l-96-40c-16.3-6.8-35.2-2.1-46.3 11.6L304.7 368C234.3 334.7 177.3 277.7 144 207.3L193.3 167c13.7-11.2 18.4-30 11.6-46.3l-40-96z"/></svg>
+                                    </div>
+                                    <strong>09165906606</strong>
+                                </div>
+                            </div>
+                            <div class="footer-brand">
+                                <svg id="brand-svg" viewBox="0 0 320 50">
+                                    <text id="brand-svg-text" x="50%" y="50%" dominant-baseline="middle">کافی نت ایمان جاتی</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <!-- ========== فوتر جدید و اصلاح‌شده اینستاگرام ========== -->
+                        <div id="instagram-footer" style="display: none;">
+                            <p class="instagram-follow-text">برای دیدن بروزترین اخبار ما را دنبال کنید</p>
+                            <div class="footer-item">
+                                <strong>CPNewsWorld</strong>
+                                <div class="footer-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9 26.3 26.2 58 34.4 93.9 36.2 37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- ==================================================== -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page-navigator">
+            <button id="prev-page-btn">&lt;</button>
+            <span id="page-indicator">۱ / ۱</span>
+            <button id="next-page-btn">&gt;</button>
+        </div>
+    </div>
+    
+    <!-- مودال انتخاب نماد -->
+    <div id="symbol-modal" style="display: none;"> <div class="modal-content"> <button id="close-modal-btn">&times;</button> <h3>انتخاب نماد</h3> <div class="symbol-grid"> <div class="symbol-item">✅</div> <div class="symbol-item">✔️</div> <div class="symbol-item">✨</div> <div class="symbol-item">✦</div> <div class="symbol-item">★</div> <div class="symbol-item">⚫</div> <div class="symbol-item">⚪</div> <div class="symbol-item">🔴</div> <div class="symbol-item">➡️</div> <div class="symbol-item">⬅️</div> <div class="symbol-item">⬆️</div> <div class="symbol-item">⬇️</div> <div class="symbol-item">🔹</div> <div class="symbol-item">🔸</div> <div class="symbol-item">▪️</div> <div class="symbol-item">▫️</div> <div class="symbol-item">📌</div> <div class="symbol-item">📍</div> <div class="symbol-item">📢</div> <div class="symbol-item">⚠️</div> <div class="symbol-item">⏳</div> <div class="symbol-item">✉️</div> <div class="symbol-item">📞</div> <div class="symbol-item">💻</div> <div class="symbol-item">💡</div> <div class="symbol-item">🔗</div> <div class="symbol-item">🔍</div> <div class="symbol-item">✏️</div> <div class="symbol-item">❝</div> <div class="symbol-item">❞</div> <div class="symbol-item">🔻</div> <div class="symbol-item">🔺</div> </div> </div> </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // تمام متغیرهای قبلی بدون تغییر باقی می‌مانند
+        const textInput = document.getElementById('text-input'), messageTextDisplay = document.getElementById('message-text-display'), channelNameDisplay = document.getElementById('channel-name-display'), backgroundColorPicker = document.getElementById('background-color-picker'), cardColorPicker = document.getElementById('card-color-picker'), textColorPicker = document.getElementById('text-color-picker'), textAlignSelector = document.getElementById('text-align-selector'), titleFontSizeSlider = document.getElementById('title-font-size-slider'), fontSizeSlider = document.getElementById('font-size-slider'), lineHeightSlider = document.getElementById('line-height-slider'), exportButton = document.getElementById('export-button'), root = document.documentElement, imageUploader = document.getElementById('image-uploader'), imageControls = document.getElementById('image-controls'), imageSizeSlider = document.getElementById('image-size-slider'), imageRadiusSlider = document.getElementById('image-radius-slider'), applyImageStyleCheckbox = document.getElementById('apply-image-style'), removeImageBtn = document.getElementById('remove-image-btn'), imagePreviewContainer = document.getElementById('image-preview-container'), uploadedImage = document.getElementById('uploaded-image'), contentMetaFooter = document.getElementById('content-meta-footer'), metaDatetimeDisplay = document.getElementById('meta-datetime-display'), metaPageIndicator = document.getElementById('meta-page-indicator'), prevPageBtn = document.getElementById('prev-page-btn'), nextPageBtn = document.getElementById('next-page-btn'), pageIndicator = document.getElementById('page-indicator'), removeEmojiCheckbox = document.getElementById('remove-emoji-checkbox'), addSymbolBtn = document.getElementById('add-symbol-btn'), symbolModal = document.getElementById('symbol-modal'), closeModalBtn = document.getElementById('close-modal-btn'), symbolItems = document.querySelectorAll('.symbol-item');
+        const titleFontSizeValue = document.getElementById('title-font-size-value'), fontSizeValue = document.getElementById('font-size-value'), lineHeightValue = document.getElementById('line-height-value'), fileNameDisplay = document.getElementById('file-name-display'), imageSizeValue = document.getElementById('image-size-value'), imageRadiusValue = document.getElementById('image-radius-value');
+        const storyWidthSlider = document.getElementById('story-width-slider'), storyHeightSlider = document.getElementById('story-height-slider'), storyWidthValue = document.getElementById('story-width-value'), storyHeightValue = document.getElementById('story-height-value'), storyBackground = document.getElementById('story-background');
+        const storyPaddingYSlider = document.getElementById('story-padding-y-slider'), storyPaddingXSlider = document.getElementById('story-padding-x-slider'), storyPaddingYValue = document.getElementById('story-padding-y-value'), storyPaddingXValue = document.getElementById('story-padding-x-value');
+        const stitchedBorderCheckbox = document.getElementById('stitched-border-checkbox'), captureArea = document.getElementById('capture-area');
+        const platformWhatsapp = document.getElementById('platform-whatsapp');
+        const platformInstagram = document.getElementById('platform-instagram');
+        const whatsappFooter = document.getElementById('whatsapp-footer');
+        const instagramFooter = document.getElementById('instagram-footer');
+
+        let pages = [], pageImages = [], currentPageIndex = 0, globalChannelName = "اطلاع رسان خبر", currentDateTimeString = '';
+
+        // =========================================================================
+        // بخش جدید: توابع ذخیره و بازیابی وضعیت در حافظه مرورگر
+        // =========================================================================
+        function saveState() {
+            const state = {
+                text: textInput.value,
+                backgroundColor: backgroundColorPicker.value,
+                cardColor: cardColorPicker.value,
+                textColor: textColorPicker.value,
+                textAlign: textAlignSelector.value,
+                titleFontSize: titleFontSizeSlider.value,
+                fontSize: fontSizeSlider.value,
+                lineHeight: lineHeightSlider.value,
+                storyWidth: storyWidthSlider.value,
+                storyHeight: storyHeightSlider.value,
+                paddingY: storyPaddingYSlider.value,
+                paddingX: storyPaddingXSlider.value,
+                stitchedBorder: stitchedBorderCheckbox.checked,
+                removeEmoji: removeEmojiCheckbox.checked,
+                platform: platformInstagram.checked ? 'instagram' : 'whatsapp',
+                pageImages: pageImages, // ذخیره عکس‌ها
+                currentPageIndex: currentPageIndex
+            };
+            localStorage.setItem('storyGeneratorState', JSON.stringify(state));
+        }
+
+        function loadState() {
+            const savedState = localStorage.getItem('storyGeneratorState');
+            if (!savedState) return;
+            try {
+                const state = JSON.parse(savedState);
+                
+                textInput.value = state.text;
+                backgroundColorPicker.value = state.backgroundColor;
+                cardColorPicker.value = state.cardColor;
+                textColorPicker.value = state.textColor;
+                textAlignSelector.value = state.textAlign;
+                titleFontSizeSlider.value = state.titleFontSize;
+                fontSizeSlider.value = state.fontSize;
+                lineHeightSlider.value = state.lineHeight;
+                storyWidthSlider.value = state.storyWidth;
+                storyHeightSlider.value = state.storyHeight;
+                storyPaddingYSlider.value = state.paddingY;
+                storyPaddingXSlider.value = state.paddingX;
+                stitchedBorderCheckbox.checked = state.stitchedBorder;
+                removeEmojiCheckbox.checked = state.removeEmoji;
+                if (state.platform === 'instagram') {
+                    platformInstagram.checked = true;
+                } else {
+                    platformWhatsapp.checked = true;
+                }
+                pageImages = state.pageImages || [];
+                currentPageIndex = state.currentPageIndex || 0;
+
+            } catch (error) {
+                console.error("Failed to load state from localStorage:", error);
+                localStorage.removeItem('storyGeneratorState'); // پاک کردن داده خراب
+            }
+        }
+        // =========================================================================
+        // پایان بخش جدید
+        // =========================================================================
+
+        function cleanEmojis(text) { const emojiRegex = /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{2B50}]+/ug; return text.replace(emojiRegex, ''); }
+        function fixHalfSpaces(text) { const ZWNJ = '\u200C'; return text.replace(new RegExp(ZWNJ, 'g'), ' '); }
+        function updateDateTime() { const now = new Date(); const timeString = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0'); const jalaliDateArray = toJalali(now.getFullYear(), now.getMonth() + 1, now.getDate()); currentDateTimeString = `${jalaliDateArray[0]}/${jalaliDateArray[1].toString().padStart(2, '0')}/${jalaliDateArray[2].toString().padStart(2, '0')} - ${timeString}`; }
+        function processTextInput() { const fullText = textInput.value; if (fullText.trim() === '') { globalChannelName = "اطلاع رسان خبر"; pages = ["محتوای شما در اینجا نمایش داده می‌شود..."]; pageImages = [null]; currentPageIndex = 0; } else { const allLines = fullText.split(/\r?\n/); globalChannelName = allLines[0].trim() || "اطلاع رسان خبر"; const contentBody = allLines.slice(1).join('\n'); const pageDelimiter = /(\r?\n\s*){2,}/; const newPages = contentBody.split(pageDelimiter).filter(p => p && p.trim() !== ''); pages = (newPages.length > 0) ? newPages : [contentBody.trim() || ""]; if (pageImages.length !== pages.length) { const newPageImages = new Array(pages.length).fill(null); for (let i = 0; i < Math.min(pageImages.length, newPageImages.length); i++) { newPageImages[i] = pageImages[i]; } pageImages = newPageImages; } if (currentPageIndex >= pages.length) { currentPageIndex = Math.max(0, pages.length - 1); } } renderCurrentPage(); saveState(); }
+        function renderCurrentPage() { if (!pages || pages.length === 0) { processTextInput(); } if (!pages) return; let titleToDisplay = (currentPageIndex === 0) ? globalChannelName : ""; let contentToDisplay = pages[currentPageIndex] || ""; if (removeEmojiCheckbox.checked) { titleToDisplay = cleanEmojis(titleToDisplay); contentToDisplay = cleanEmojis(contentToDisplay); } const fixedTitle = fixHalfSpaces(titleToDisplay); const fixedContent = fixHalfSpaces(contentToDisplay); channelNameDisplay.innerText = fixedTitle; channelNameDisplay.style.display = (currentPageIndex === 0) ? 'block' : 'none'; messageTextDisplay.innerText = fixedContent; const currentImage = pageImages[currentPageIndex]; if (currentImage) { imagePreviewContainer.style.display = 'flex'; uploadedImage.src = currentImage.src; uploadedImage.style.width = currentImage.size + '%'; if (currentImage.isStyled) { uploadedImage.classList.add('styled'); uploadedImage.style.borderRadius = currentImage.radius + 'px'; } else { uploadedImage.classList.remove('styled'); uploadedImage.style.borderRadius = '0px'; } imageControls.style.display = 'block'; imageSizeSlider.value = currentImage.size; imageRadiusSlider.value = currentImage.radius; applyImageStyleCheckbox.checked = currentImage.isStyled; imageSizeValue.textContent = currentImage.size + '%'; imageRadiusValue.textContent = currentImage.radius + 'px'; } else { imagePreviewContainer.style.display = 'none'; uploadedImage.src = ''; imageControls.style.display = 'none'; } updateDateTime(); contentMetaFooter.style.display = (pages.length > 1) ? 'flex' : 'none'; if (pages.length > 1) { metaDatetimeDisplay.textContent = currentDateTimeString; metaPageIndicator.textContent = `صفحه ${currentPageIndex + 1} از ${pages.length}`; } pageIndicator.textContent = `${currentPageIndex + 1} / ${pages.length || 1}`; prevPageBtn.disabled = currentPageIndex === 0; nextPageBtn.disabled = currentPageIndex >= pages.length - 1; }
+        
+        const updateStoryBackgroundColor = () => { root.style.setProperty('--story-bg-color', backgroundColorPicker.value); saveState(); };
+        const updateCardColor = () => { root.style.setProperty('--card-bg-color', cardColorPicker.value); root.style.setProperty('--footer-bg-color', cardColorPicker.value); saveState(); };
+        const updateTextColor = () => { root.style.setProperty('--primary-text-color', textColorPicker.value); saveState(); };
+        const updateTextAlign = () => { messageTextDisplay.style.textAlign = textAlignSelector.value; saveState(); };
+        const updateTitleFontSize = (e) => { root.style.setProperty('--title-font-size', e.target.value + 'px'); titleFontSizeValue.textContent = e.target.value + 'px'; saveState(); };
+        const updateFontSize = (e) => { messageTextDisplay.style.fontSize = e.target.value + 'px'; fontSizeValue.textContent = e.target.value + 'px'; saveState(); };
+        const updateLineHeight = (e) => { messageTextDisplay.style.lineHeight = e.target.value; lineHeightValue.textContent = parseFloat(e.target.value).toFixed(1); saveState(); };
+        const updateStoryWidth = (e) => { const newWidth = e.target.value; storyBackground.style.width = newWidth + 'px'; storyWidthValue.textContent = newWidth + 'px'; saveState(); };
+        const updateStoryHeight = (e) => { const newHeight = e.target.value; storyBackground.style.height = newHeight + 'px'; storyHeightValue.textContent = newHeight + 'px'; saveState(); };
+        const updateStoryPadding = () => { const paddingY = storyPaddingYSlider.value, paddingX = storyPaddingXSlider.value; storyBackground.style.padding = `${paddingY}px ${paddingX}px`; storyPaddingYValue.textContent = paddingY + 'px'; storyPaddingXValue.textContent = paddingX + 'px'; saveState(); };
+        const updateStitchedBorder = () => { stitchedBorderCheckbox.checked ? captureArea.classList.add('stitched-border') : captureArea.classList.remove('stitched-border'); saveState(); };
+        function updateFooter() { if (platformInstagram.checked) { whatsappFooter.style.display = 'none'; instagramFooter.style.display = 'block'; } else { whatsappFooter.style.display = 'block'; instagramFooter.style.display = 'none'; } saveState(); }
+
+        textInput.addEventListener('input', processTextInput);
+        backgroundColorPicker.addEventListener('input', updateStoryBackgroundColor); cardColorPicker.addEventListener('input', updateCardColor); textColorPicker.addEventListener('input', updateTextColor); textAlignSelector.addEventListener('input', updateTextAlign); 
+        removeEmojiCheckbox.addEventListener('change', () => { renderCurrentPage(); saveState(); });
+        titleFontSizeSlider.addEventListener('input', updateTitleFontSize);
+        fontSizeSlider.addEventListener('input', updateFontSize);
+        lineHeightSlider.addEventListener('input', updateLineHeight);
+        storyWidthSlider.addEventListener('input', updateStoryWidth);
+        storyHeightSlider.addEventListener('input', updateStoryHeight);
+        storyPaddingYSlider.addEventListener('input', updateStoryPadding);
+        storyPaddingXSlider.addEventListener('input', updateStoryPadding);
+        stitchedBorderCheckbox.addEventListener('change', updateStitchedBorder);
+        platformWhatsapp.addEventListener('change', updateFooter);
+        platformInstagram.addEventListener('change', updateFooter);
+        
+        nextPageBtn.addEventListener('click', () => { if (currentPageIndex < pages.length - 1) { currentPageIndex++; renderCurrentPage(); saveState(); } });
+        prevPageBtn.addEventListener('click', () => { if (currentPageIndex > 0) { currentPageIndex--; renderCurrentPage(); saveState(); } });
+        
+        imageUploader.addEventListener('change', function(event) { const file = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = function(e) { if (!pageImages) { pageImages = new Array(pages.length).fill(null); } pageImages[currentPageIndex] = { src: e.target.result, size: 50, radius: 12, isStyled: true }; fileNameDisplay.textContent = file.name; renderCurrentPage(); saveState(); }; reader.readAsDataURL(file); } });
+        removeImageBtn.addEventListener('click', () => { pageImages[currentPageIndex] = null; imageUploader.value = null; fileNameDisplay.textContent = 'فایلی انتخاب نشده'; renderCurrentPage(); saveState(); });
+        imageSizeSlider.addEventListener('input', (e) => { if (pageImages[currentPageIndex]) { pageImages[currentPageIndex].size = e.target.value; imageSizeValue.textContent = e.target.value + '%'; renderCurrentPage(); saveState(); } });
+        imageRadiusSlider.addEventListener('input', (e) => { if (pageImages[currentPageIndex]) { pageImages[currentPageIndex].radius = e.target.value; imageRadiusValue.textContent = e.target.value + 'px'; renderCurrentPage(); saveState(); } });
+        applyImageStyleCheckbox.addEventListener('change', (e) => { if (pageImages[currentPageIndex]) { pageImages[currentPageIndex].isStyled = e.target.checked; renderCurrentPage(); saveState(); } });
+        
+        addSymbolBtn.addEventListener('click', () => { symbolModal.style.display = 'flex'; });
+        closeModalBtn.addEventListener('click', () => { symbolModal.style.display = 'none'; });
+        symbolModal.addEventListener('click', (e) => { if (e.target === symbolModal) { symbolModal.style.display = 'none'; } });
+        symbolItems.forEach(item => { item.addEventListener('click', () => { const symbol = item.textContent; const start = textInput.selectionStart; const end = textInput.selectionEnd; const text = textInput.value; textInput.value = text.substring(0, start) + symbol + text.substring(end); textInput.selectionStart = textInput.selectionEnd = start + symbol.length; symbolModal.style.display = 'none'; textInput.focus(); processTextInput(); }); });
+        
+        exportButton.addEventListener('click', async function() {
+            updateDateTime(); // <--- بهبود: به‌روزرسانی زمان دقیقا قبل از خروجی گرفتن
+            renderCurrentPage(); // اطمینان از نمایش زمان جدید در پیش‌نمایش
+            
+            const node = document.getElementById('story-background');
+            exportButton.disabled = true;
+            exportButton.textContent = 'در حال ساخت عکس...';
+            const originalOverflow = messageTextDisplay.style.overflowY;
+            messageTextDisplay.style.overflowY = 'hidden';
+            try {
+                await document.fonts.load('1em "Vazirmatn"');
+                await new Promise(resolve => setTimeout(resolve, 100));
+                const canvas = await html2canvas(node, { scale: 6, useCORS: true, logging: false, letterRendering: true, backgroundColor: null });
+                const dataUrl = canvas.toDataURL('image/png', 1.0);
+                const link = document.createElement('a');
+                link.download = `Kafinet-Iman-Story-4K-${Date.now()}.png`;
+                link.href = dataUrl;
+                link.click();
+            } catch (error) {
+                console.error('An error occurred:', error);
+                alert('متاسفانه در ساخت عکس خطایی رخ داد.');
+            } finally {
+                messageTextDisplay.style.overflowY = originalOverflow;
+                exportButton.disabled = false;
+                exportButton.textContent = 'ساخت استوری نهایی (کیفیت 4K)';
+            }
+        });
+        
+        const accordionHeaders = document.querySelectorAll('.accordion-header');
+        accordionHeaders.forEach(header => { header.addEventListener('click', () => { const content = header.nextElementSibling; const isActive = header.classList.contains('active'); accordionHeaders.forEach(h => { h.classList.remove('active'); h.nextElementSibling.style.maxHeight = null; }); if (!isActive) { header.classList.add('active'); content.style.maxHeight = content.scrollHeight + 'px'; } }); });
+        if (accordionHeaders.length > 0) { const firstHeader = accordionHeaders[0]; const firstContent = firstHeader.nextElementSibling; firstHeader.classList.add('active'); setTimeout(() => { firstContent.style.maxHeight = firstContent.scrollHeight + 'px'; }, 100); }
+        
+        // اجرای توابع اولیه
+        loadState(); // <-- جدید: بارگذاری وضعیت ذخیره‌شده
+        
+        // به‌روزرسانی همه مقادیر و پیش‌نمایش بر اساس مقادیر فعلی (چه پیش‌فرض و چه بارگذاری شده)
+        updateStoryBackgroundColor();
+        updateCardColor();
+        updateTextColor();
+        updateTextAlign();
+        root.style.setProperty('--title-font-size', titleFontSizeSlider.value + 'px');
+        titleFontSizeValue.textContent = titleFontSizeSlider.value + 'px';
+        messageTextDisplay.style.fontSize = fontSizeSlider.value + 'px';
+        fontSizeValue.textContent = fontSizeSlider.value + 'px';
+        messageTextDisplay.style.lineHeight = lineHeightSlider.value;
+        lineHeightValue.textContent = parseFloat(lineHeightSlider.value).toFixed(1);
+        storyBackground.style.width = storyWidthSlider.value + 'px';
+        storyWidthValue.textContent = storyWidthSlider.value + 'px';
+        storyBackground.style.height = storyHeightSlider.value + 'px';
+        storyHeightValue.textContent = storyHeightSlider.value + 'px';
+        updateStoryPadding();
+        updateStitchedBorder();
+        updateFooter();
+        processTextInput(); // این تابع در انتها فراخوانی می‌شود تا متن و صفحات را پردازش و نمایش دهد
+
+    });
+    </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(registration => {
+          console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        })
+        .catch(err => {
+          console.log('ServiceWorker registration failed: ', err);
+        });
+    });
+  }
+</script>
+</body>
+</html>

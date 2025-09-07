@@ -1,0 +1,16 @@
+{
+  "name": "مولد استوری Masterpiece",
+  "short_name": "مولد استوری",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d6efd",
+  "description": "ابزار ساخت استوری برای کافی نت",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
