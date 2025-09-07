@@ -169,6 +169,162 @@
 
             .page-navigator button {
                 width: 45px;
+    <style>
+        :root {
+            --card-bg-color: #ffffff; --story-bg-color: #ffde59; --primary-text-color: #212529;
+            --footer-bg-color: #f8f9fa; --primary-accent-color: #0d6efd; --meta-text-color: #888;
+            --title-font-size: 1.2em; --border-color: #dee2e6;
+        }
+        body {
+            font-family: 'Vazirmatn', sans-serif; background-color: #f0f2f5;
+            display: grid; grid-template-columns: 480px 420px;
+            justify-content: center; align-items: flex-start; gap: 30px; padding: 30px;
+        }
+        @media (max-width: 980px) {
+            body { grid-template-columns: 1fr; max-width: 500px; margin: auto; }
+        }
+        .container {
+            background-color: #fff; padding: 25px 30px; border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08); width: 100%; box-sizing: border-box;
+        }
+        h2 { color: #333; padding-bottom: 15px; margin: 0 0 25px 0; font-size: 1.5em; text-align: center; }
+        h3 { color: #333; border-bottom: 2px solid var(--primary-accent-color); padding-bottom: 10px; margin-top: 0; }
+        .control-panel { display: flex; flex-direction: column; gap: 0; }
+        .settings-group { border-top: 1px solid var(--border-color); }
+        .settings-group:first-child { border-top: none; }
+        .grid-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px 20px; }
+        .control-group { display: flex; flex-direction: column; gap: 10px; }
+        label { font-weight: bold; color: #555; font-size: 0.95em; display: flex; justify-content: space-between; align-items: center; }
+        .slider-value { font-weight: normal; font-size: 0.9em; background-color: #e9ecef; color: #495057; padding: 3px 8px; border-radius: 7px; }
+        select, #add-symbol-btn { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); font-family: inherit; background-color: #f8f9fa; transition: border-color 0.2s; }
+        select:hover, #add-symbol-btn:hover { border-color: #aaa; }
+        #add-symbol-btn { cursor: pointer; text-align: center; margin-top: -10px; margin-bottom: 15px; font-weight: bold; color: #333; }
+        input[type="range"] { width: 100%; height: 8px; background: #e9ecef; border-radius: 5px; outline: none; -webkit-appearance: none; appearance: none; margin-top: 5px; }
+        input[type="range"]::-webkit-slider-thumb { width: 20px; height: 20px; background: var(--primary-accent-color); border-radius: 50%; cursor: pointer; -webkit-appearance: none; appearance: none; transition: transform 0.2s; }
+        input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+        .color-picker-wrapper { display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); }
+        input[type="color"] { -webkit-appearance: none; appearance: none; width: 28px; height: 28px; padding: 0; border: none; border-radius: 50%; cursor: pointer; background-color: transparent; }
+        input[type="color"]::-webkit-color-swatch { border-radius: 50%; border: 2px solid #e0e0e0; }
+        #text-input { width: 100%; height: 120px; padding: 10px; font-size: 1em; border-radius: 8px; resize: vertical; border: 1px solid var(--border-color); box-sizing: border-box; margin-bottom: 15px; }
+        .checkbox-group { display: flex; flex-direction: row; align-items: center; gap: 10px; background: #f8f9fa; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 10px; }
+        .checkbox-group:last-child { margin-bottom: 0; }
+        .checkbox-group label { margin-bottom: 0; font-weight: normal; cursor: pointer; width: 100%; }
+        
+        .accordion-header { cursor: pointer; position: relative; margin-bottom: 0; padding: 20px 0; border-bottom: none; color: #333; font-size: 1.1em; transition: color 0.2s; }
+        .accordion-header:hover { color: var(--primary-accent-color); }
+        .accordion-header::before {
+            content: '+';
+            position: absolute;
+            right: 0; /* <-- اصلاح شد */
+            left: auto; /* <-- اضافه شد */
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.6em;
+            font-weight: bold;
+            color: var(--primary-accent-color);
+            transition: transform 0.3s ease-out;
+        }
+        .accordion-header.active::before { content: '−'; transform: translateY(-50%) rotate(180deg); }
+        .accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, padding 0.4s ease-out; padding: 0; }
+        .accordion-header.active + .accordion-content { padding-bottom: 25px; }
+
+        input[type="file"] { display: none; }
+        .custom-file-upload { border: 1px dashed #aaa; border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background-color 0.2s, border-color 0.2s; }
+        .custom-file-upload:hover { background-color: #f8f9fa; border-color: var(--primary-accent-color); }
+        #file-name-display { font-size: 0.9em; color: #6c757d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
+        
+        #export-wrapper { display: inline-block; }
+        #story-background { border-radius: 25px; display: flex; align-items: center; justify-content: center; box-sizing: border-box; background-color: var(--story-bg-color); transition: width 0.1s, height 0.1s; }
+        #capture-area { width: 100%; height: 100%; background-color: var(--card-bg-color); border-radius: 20px; box-shadow: 0 15px 45px rgba(0,0,0,0.2); display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box; }
+        #capture-area.stitched-border { border: 2px dashed rgba(0, 0, 0, 0.2); }
+        .post-container { flex-grow: 1; display: flex; flex-direction: column; padding: 30px 25px 0; direction: rtl; overflow: hidden; }
+        #image-preview-container { display: flex; justify-content: center; margin-bottom: 20px; flex-shrink: 0; }
+        #uploaded-image { max-width: 100%; height: auto; object-fit: contain; transition: all 0.2s; }
+        #uploaded-image.styled { border-radius: 12px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15); }
+        .channel-name, .message-text { text-rendering: optimizeLegibility; }
+        .channel-name { font-weight: bold; color: var(--primary-text-color); margin-bottom: 15px; font-size: var(--title-font-size); flex-shrink: 0; }
+        .message-text { font-size: 17px; line-height: 2; color: var(--primary-text-color); white-space: pre-wrap; word-wrap: break-word; text-align: justify; overflow-y: auto; flex-grow: 1; padding-bottom: 15px; }
+        .content-meta-footer, .ad-footer, .page-navigator { flex-shrink: 0; }
+        .content-meta-footer { display: none; position: relative; align-items: center; padding: 10px 25px; border-top: 1px dashed #ccc; color: var(--meta-text-color); font-size: 0.8em; }
+        #meta-datetime-display { direction: ltr; }
+        #meta-page-indicator { position: absolute; left: 50%; transform: translateX(-50%); font-weight: bold; }
+        .ad-footer { background-color: var(--footer-bg-color); color: #444; padding: 15px 25px; border-top: 1px solid #e9ecef; direction: rtl; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
+        .footer-info { margin-bottom: 15px; } .footer-item { display: flex; align-items: center; gap: 12px; font-size: 0.9em; } .footer-item:first-child { margin-bottom: 10px; } .footer-icon svg { width: 18px; height: 18px; fill: #555; }
+        .footer-brand { border-top: 1px solid #dee2e6; padding-top: 15px; text-align: center; }
+        #brand-svg-text { font-size: 28px; font-weight: 900; fill: var(--primary-text-color); text-anchor: middle; letter-spacing: 0.5px; }
+        
+        .instagram-follow-text { text-align: center; font-size: 0.9em; color: #666; margin: 0 0 10px 0; }
+        #instagram-footer .footer-item { justify-content: center; align-items: center; font-size: 1.2em; gap: 8px; }
+        #instagram-footer .footer-icon svg { width: 22px; height: 22px; fill: var(--primary-text-color); }
+        #instagram-footer strong { font-size: 1.2em; font-weight: 700; color: var(--primary-text-color); }
+
+        #export-button, #remove-image-btn { margin-top: 25px; padding: 15px; font-size: 1.2em; font-weight: bold; border: none; border-radius: 10px; cursor: pointer; width: 100%; transition: all 0.2s; }
+        #export-button { background-image: linear-gradient(45deg, var(--primary-accent-color), #0a58ca); color: white; }
+        #export-button:disabled { background-image: none; background-color: #6c757d; cursor: wait;}
+        #remove-image-btn { background-image: linear-gradient(45deg, #dc3545, #b02a37); color: white; margin-top: 10px; }
+        .page-navigator { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-top: 15px; }
+        .page-navigator button { background-color: #e9ecef; color: #333; border: 1px solid var(--border-color); border-radius: 8px; font-size: 1.5em; font-weight: bold; cursor: pointer; width: 50px; height: 40px; transition: all 0.2s; }
+        .page-navigator button:hover:not(:disabled) { background-color: var(--primary-accent-color); color: white; border-color: var(--primary-accent-color); }
+        .page-navigator button:disabled { background-color: #f8f9fa; color: #ced4da; cursor: not-allowed; }
+        #page-indicator { font-size: 1.1em; font-weight: bold; color: #555; }
+        #symbol-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        .modal-content { background-color: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); width: 90%; max-width: 400px; text-align: center; position: relative; }
+        #close-modal-btn { position: absolute; top: 10px; left: 15px; font-size: 28px; font-weight: bold; color: #888; cursor: pointer; border: none; background: none; }
+        .symbol-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 10px; margin-top: 20px; max-height: 250px; overflow-y: auto; padding: 5px; }
+        .symbol-item { cursor: pointer; padding: 10px; border-radius: 8px; background-color: #f1f3f5; font-size: 1.4em; transition: background-color 0.2s, transform 0.1s; }
+        .symbol-item:hover { background-color: #dee2e6; transform: scale(1.1); }
+        
+        /* ================================================================= */
+        /* ========== استایل‌های بهینه‌سازی شده برای نمایشگر موبایل ========== */
+        /* ================================================================= */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px; /* کاهش حاشیه کلی صفحه */
+                gap: 20px;     /* کاهش فاصله بین پنل تنظیمات و پیش‌نمایش */
+            }
+
+            .container {
+                padding: 20px 15px; /* کاهش حاشیه داخلی کارت‌ها */
+            }
+
+            h2 {
+                font-size: 1.3em;  /* کوچک‌کردن تیتر اصلی */
+                margin-bottom: 15px;
+            }
+
+            h3, .accordion-header {
+                font-size: 1.05em; /* کوچک‌کردن تیترهای بخش‌ها */
+                padding-top: 15px;
+                padding-bottom: 15px;
+            }
+
+            label {
+                font-size: 0.9em; /* کوچک‌تر کردن متن لیبل‌ها */
+            }
+
+            /* فشرده‌سازی کنترل‌ها و دکمه‌ها */
+            select, 
+            #add-symbol-btn, 
+            .custom-file-upload,
+            .checkbox-group {
+                padding: 10px 12px;
+                font-size: 0.95em;
+            }
+
+            #text-input {
+                height: 100px; /* کاهش ارتفاع پیش‌فرض باکس متن */
+                font-size: 0.95em;
+            }
+
+            #export-button, 
+            #remove-image-btn {
+                padding: 12px;
+                font-size: 1.1em;
+                margin-top: 20px;
+            }
+
+            .page-navigator button {
+                width: 45px;
                 height: 38px;
                 font-size: 1.3em;
             }
@@ -371,3 +527,4 @@
     </script>
 </body>
 </html>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     </html>
+
